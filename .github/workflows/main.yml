@@ -1,0 +1,40 @@
+name: Trading Job Telegram Alert
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  job-alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Repository files:"
+          ls -la
+          echo "Python files:"
+          find . -maxdepth 3 -type f -name "*.py"
+
+      - name: Run Job Alert
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          python job_alert.py
